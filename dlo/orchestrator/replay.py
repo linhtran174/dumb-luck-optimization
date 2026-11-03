@@ -156,6 +156,9 @@ class Replay:
                                                                    "revise_every": cfg.revise_every,
                                                                    "budget": cfg.budget}),
                                     "notes": None})
+        elif start >= len(self.days):
+            logs.event(log, "run_already_complete", run=cfg.run_id)
+            return {"run_id": cfg.run_id, "days": len(self.days), "already_complete": True}
         else:
             self.store.event(cfg.run_id, None, None, "resume", {"from_day": str(self.days[start])})
         panel = self.view.full_for_simulator()

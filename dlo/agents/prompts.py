@@ -15,7 +15,7 @@ Rules
 - Your objective is to maximize net equity: portfolio value after trading and inference costs.
 
 Data
-- Per asset, oldest to newest over the last 60 trading days: ret% (close-to-close return), gap% (open versus previous close), rng% (high minus low, relative to previous close), close (indexed to 100 on the first day of the period), rvol (volume relative to its median before the period).
+- Per asset, oldest to newest, the last value being today: ret% (close-to-close return) and close (indexed to 100 on the first day of the period, rounded) over the last 60 trading days; gap% (open versus previous close), rng% (high minus low, relative to previous close) and rvol (volume relative to its median before the period) over the last 20 trading days.
 - News items published since the previous trading day's decision time, rewritten in neutral style; companies appear by their asset label.
 
 Answer with one JSON object:

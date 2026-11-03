@@ -60,8 +60,12 @@ def _series(vals: list, nd: int = 1) -> str:
     return " ".join(fmt(v, nd) for v in vals)
 
 
+SHORT_LOOKBACK = 20   # gap%, rng%, rvol shown for the last 20 days; ret% and close for all 60 (30 KB budget)
+
+
 def market_block(tables: dict[str, pl.DataFrame], labels: dict[str, str]) -> str:
     lines = []
+    n = SHORT_LOOKBACK
     order = [MARKET_KEY] + sorted(labels, key=lambda k: labels[k])
     for key in order:
         g = tables.get(key)
@@ -70,10 +74,10 @@ def market_block(tables: dict[str, pl.DataFrame], labels: dict[str, str]) -> str
         name = "MARKET" if key == MARKET_KEY else labels[key]
         lines.append(f"{name}")
         lines.append(f" ret%  {_series(g['ret_pct'].to_list())}")
-        lines.append(f" gap%  {_series(g['gap_pct'].to_list())}")
-        lines.append(f" rng%  {_series(g['range_pct'].to_list())}")
-        lines.append(f" close {_series(g['idx_close'].to_list())}")
-        lines.append(f" rvol  {_series(g['rel_vol'].to_list())}")
+        lines.append(f" close {_series(g['idx_close'].to_list(), 0)}")
+        lines.append(f" gap%  {_series(g['gap_pct'].to_list()[-n:])}")
+        lines.append(f" rng%  {_series(g['range_pct'].to_list()[-n:])}")
+        lines.append(f" rvol  {_series(g['rel_vol'].to_list()[-n:])}")
     return "\n".join(lines)
 
 
