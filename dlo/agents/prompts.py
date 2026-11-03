@@ -25,7 +25,9 @@ Answer with one JSON object:
 - confidence: your confidence in this decision, in [0, 1].
 - next_review_in_days: 1, 2, 3 or 5 trading days until your next decision.
 - rationale: for every asset, at most 40 words; required for any asset with weight above 0 or absolute score above 0.5, otherwise an empty string.
-- market_view: at most 60 words."""
+- market_view: at most 60 words.
+
+Before answering, check: (1) the 20 asset weights plus cash add up to exactly 1.00; (2) no asset weight is above {c['max_weight']:.2f}; (3) every asset with weight above 0 or absolute score above 0.5 has a non-empty rationale."""
 
 
 def memo_system() -> str:

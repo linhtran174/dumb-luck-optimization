@@ -70,19 +70,29 @@ def _text(name: str, d0: date, d1: date, up: bool, mag: float) -> str:
     return f"{sub} {verb} {size} between {d0:%B} {d0.day}, {d0.year} and {d1:%B} {d1.day}, {d1.year}."
 
 
-async def run(client: LLMClient, bars: pl.DataFrame, models: list[str]) -> dict:
+FORCED_SCHEMA = {"name": "g0_forced", "strict": True, "schema": {
+    "type": "object", "additionalProperties": False, "required": ["answer"],
+    "properties": {"answer": {"type": "string", "enum": ["yes", "no"]}}}}
+FORCED_SYSTEM = ("Is the following statement about a past event true? If you are unsure, give your best guess. "
+                 "Reply yes or no.")
+
+
+async def run(client: LLMClient, bars: pl.DataFrame, models: list[str], forced: bool = False) -> dict:
+    """forced=False allows "don't know" (the plan's protocol); forced=True requires a yes/no guess, which
+    exposes partial knowledge that abstention would hide."""
     stmts = build_statements(bars)
+    schema, system = (FORCED_SCHEMA, FORCED_SYSTEM) if forced else (SCHEMA, SYSTEM)
 
     async def ask(model: str, s: dict):
         try:
             out = await client.chat(ChatRequest(
-                model_key=model, purpose="g0", budget="infra", json_schema=SCHEMA,
-                messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": s["statement"]}]))
+                model_key=model, purpose="g0_forced" if forced else "g0", budget="infra", json_schema=schema,
+                messages=[{"role": "system", "content": system}, {"role": "user", "content": s["statement"]}]))
             return json.loads(out.content)["answer"]
         except (LLMError, json.JSONDecodeError, KeyError) as e:
             return f"error:{type(e).__name__}"
 
-    result = {"gate": "G0", "statements": stmts, "models": {}}
+    result = {"gate": "G0", "forced": forced, "statements": stmts, "models": {}}
     for m in models:
         answers = await asyncio.gather(*(ask(m, s) for s in stmts))
         rows = [dict(s, answer=a) for s, a in zip(stmts, answers)]

@@ -177,7 +177,7 @@ def gate_g4() -> None:
 
 
 @gate_app.command("g0")
-def gate_g0() -> None:
+def gate_g0(forced: bool = False) -> None:
     """Post-cutoff knowledge check for both evaluated models (80 small calls)."""
     from dlo.analysis import g0
     from dlo.data.snapshot import Snapshot
@@ -185,12 +185,12 @@ def gate_g0() -> None:
     async def run():
         c = _client()
         try:
-            return await g0.run(c, Snapshot().bars, ["terra", "luna"])
+            return await g0.run(c, Snapshot().bars, ["terra", "luna"], forced=forced)
         finally:
             await c.aclose()
 
     res = asyncio.run(run())
-    _write_gate("G0", res)
+    _write_gate("G0_forced" if forced else "G0", res)
     typer.echo(json.dumps({"pass": res["pass"], **{m: {k: v for k, v in r.items() if k != "answers"}
                                                    for m, r in res["models"].items()}}, indent=1))
 
@@ -266,3 +266,21 @@ def analyze_report(run_id: str, judge: bool = True) -> None:
 
     asyncio.run(run())
     typer.echo((report.REPORT_DIR / f"{run_id.replace('/', '_')}.md").read_text())
+
+
+@analyze_app.command("export-judge")
+def export_judge(run_id: str) -> None:
+    """Write the judge's rationale items to a CSV with an empty human_label column (CAUSAL/UNCERTAIN/OTHER)."""
+    import csv
+    from dlo.analysis.report import REPORT_DIR
+    base = run_id.replace("/", "_")
+    items = json.loads((REPORT_DIR / f"{base}_judge_items.json").read_text())
+    out = REPORT_DIR / f"{base}_human_labels.csv"
+    if out.exists():
+        raise typer.BadParameter(f"{out} exists; not overwriting human labels")
+    with open(out, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["item_id", "rationale", "human_label"])
+        w.writeheader()
+        for it in items:
+            w.writerow({"item_id": it["item_id"], "rationale": it["rationale"], "human_label": ""})
+    typer.echo(f"{len(items)} items -> {out}")
