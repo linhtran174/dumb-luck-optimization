@@ -42,4 +42,4 @@ synthetic:
     momentum: {strengths: [0.05, 0.10, 0.20]}
     news_lead: {strengths: [0.05, 0.10, 0.20]}
   event_day_prob: 0.20
-  bootstrap_mean_block: 10
+  bootstrap_mean_block: 20      # plan default 10; raised to 20 in M3 (G1: too little volatility clustering)

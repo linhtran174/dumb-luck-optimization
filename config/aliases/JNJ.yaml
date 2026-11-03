@@ -1,0 +1,93 @@
+ticker: JNJ
+name: Johnson & Johnson
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - J&J
+  - JNJ
+  - Johnson & Johnson
+  - Johnson and Johnson
+  products_and_brands:
+  - ACUVUE OASYS MAX
+  - AKEEGA
+  - CAPLYTA
+  - CAPTIVA
+  - CARVYKTI
+  - DARZALEX
+  - DARZALEX FASPRO
+  - DUPLEX-AD
+  - ERLEADA
+  - ETHICON 4000
+  - FUZION
+  - GALAXI
+  - Gemcitabine Intravesical System
+  - ICONIC
+  - ICOTYDE
+  - IMAAVY
+  - JASMINE
+  - JNJ-4804
+  - JNJ-5939
+  - JNJ-6143
+  - MARIPOSA
+  - MONARCH QUEST
+  - Nipocalimab
+  - OrigAMI-4
+  - PAPILLON
+  - PROTEUS
+  - RYBREVANT
+  - Shockwave C2 Aero Fly
+  - SunRISe-1
+  - TALVEY
+  - TECNIS PureSee
+  - TECVAYLI
+  - THERMOCOOL SMARTTOUCH SF
+  - TREMFYA
+  - TRUFILL n-BCA
+  - Tylenol
+  - VARIPULSE Pro
+  - amivantamab
+  - apalutamide
+  - bleximenib
+  - erdafitinib
+  - guselkumab
+  - rivaroxaban
+  executives: []
+  subsidiaries:
+  - DePuy Synthes
+  - Expanding Innovations
+  - Kenvue
+  major_partners:
+  - Blackstone Life Sciences
+  - Firefly Bio
+  - Genmab
+  - Halozyme
+  - Halozyme Therapeutics
+  - Monte Rosa
+  - Protagonist Therapeutics
+  - Sail Biomedicines
+  - Smith & Nephew
+  facilities_and_places:
+  - Montgomery County, Pennsylvania
+  hand_seed:
+  - Abiomed
+  - Caplyta
+  - Carvykti
+  - Darzalex
+  - Duato
+  - Intra-Cellular
+  - J&J
+  - JNJ
+  - Janssen
+  - Joaquin Duato
+  - Johnson & Johnson
+  - Johnson and Johnson
+  - Kenvue
+  - Rybrevant
+  - Shockwave
+  - Stelara
+  - Tremfya
+  - talc
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

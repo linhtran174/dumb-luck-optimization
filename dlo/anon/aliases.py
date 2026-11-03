@@ -60,8 +60,9 @@ def compiled() -> list[tuple[str, re.Pattern]]:
     pats: list[tuple[str, re.Pattern]] = []
     for t, terms in load_aliases().items():
         for term in terms:
-            # Tickers and short all-caps terms are case-sensitive ("COST" vs "cost"); names are not.
-            flags = 0 if (term.isupper() and len(term) <= 5) else re.I
+            # Proper nouns and tickers match case-sensitively ("COST" vs "cost", "Chase" vs "chase");
+            # all-lowercase terms (generic drug names such as "tirzepatide") match case-insensitively.
+            flags = re.I if term.islower() else 0
             pats.append((f"{t}:{term}", re.compile(_term_regex(term), flags)))
     for p in GENERIC_PATTERNS:
         pats.append((f"generic:{p}", re.compile(p)))

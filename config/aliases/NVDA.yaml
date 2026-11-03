@@ -1,0 +1,72 @@
+ticker: NVDA
+name: NVIDIA Corp
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - NVDA
+  - NVIDIA
+  - NVIDIA Corp
+  - Nvidia
+  products_and_brands:
+  - A100
+  - Blackwell Ultra
+  - BlueField-4
+  - GB300
+  - Guardicore Segmentation
+  - H200
+  - Hyperion
+  - Ising
+  - Kyber
+  - NVIDIA Networking Technology
+  - Oberon
+  - OpenShell
+  - RTX Spark
+  - Vera Rubin
+  - Vera Rubin NVL-4
+  executives:
+  - Huang
+  - Jensen Huang
+  subsidiaries:
+  - Hugging Face
+  major_partners:
+  - Arm
+  - CoreWeave
+  - Dell Technologies
+  - Foxconn
+  - Groq
+  - Mellanox
+  - Nebius
+  - OpenAI
+  - SK Hynix
+  - Super Micro Computer
+  - Supermicro
+  - TSMC
+  - Taiwan Semiconductor
+  - Wistron
+  facilities_and_places: []
+  hand_seed:
+  - B200
+  - B300
+  - Blackwell
+  - CUDA
+  - DGX
+  - GB200
+  - GB300
+  - GeForce
+  - Grace Hopper
+  - H100
+  - H20
+  - H200
+  - Hopper
+  - Huang
+  - Jensen Huang
+  - Mellanox
+  - NVDA
+  - NVIDIA
+  - NVLink
+  - Nvidia
+  - Rubin
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

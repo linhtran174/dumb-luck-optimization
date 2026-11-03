@@ -29,10 +29,12 @@ models:
     slug: deepseek/deepseek-v4-flash-20260423
     list_price_per_m: {input: 0.09, output: 0.18}
     knowledge_cutoff: null
-    reasoning_effort: null     # infra jobs run without extended reasoning
+    reasoning_effort: null
+    reasoning_enabled: false   # infra jobs run without extended reasoning (some hosts default it on)
     max_tokens: 4000
     temperature: 0.0
     structured_outputs: true
     # fp8 providers that support structured outputs; no fallback outside this list.
-    provider: {order: [deepinfra, streamlake, fireworks, crusoe], allow_fallbacks: false, require_parameters: true}
+    # StreamLake excluded: it spent max_tokens on hidden reasoning and returned empty content (2026-11-03).
+    provider: {order: [deepinfra, fireworks, crusoe], allow_fallbacks: false, require_parameters: true}
     max_concurrency: 16

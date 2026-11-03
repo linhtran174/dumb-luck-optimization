@@ -75,6 +75,8 @@ def build_body(req: ChatRequest) -> dict[str, Any]:
     }
     if m.get("reasoning_effort"):
         body["reasoning"] = {"effort": m["reasoning_effort"]}
+    elif m.get("reasoning_enabled") is False:
+        body["reasoning"] = {"enabled": False}
     if m.get("temperature") is not None:
         body["temperature"] = m["temperature"]
     if req.json_schema is not None and m.get("structured_outputs"):
@@ -181,7 +183,8 @@ class OpenRouterClient:
                 return _result_from_row({**row, "call_id": call_id}, cached=False)
             last_err = row["error"] or "unknown"
             retryable = status is None or status in (408, 409, 425, 429) or (status and status >= 500) or \
-                (problem or "").startswith("empty") or (problem or "").startswith("upstream")
+                ((problem or "").startswith("empty") and "finish_reason=length" not in (problem or "")) or \
+                (problem or "").startswith("upstream")
             logs.event(log, "llm_call_failed", purpose=req.purpose, model=req.model_key, status=status,
                        error=last_err[:300], attempt=http_attempt, retryable=bool(retryable))
             if not retryable or http_attempt == self.max_http_attempts:
@@ -242,3 +245,24 @@ class MockLLMClient:
         return ChatResult(content=content, cost=self.cost, prompt_tokens=100, completion_tokens=50,
                           reasoning_tokens=0, call_id=f"mock-{len(self.calls)}", cached=False,
                           provider="mock", response_model=req.model_key)
+
+
+async def chat_json(client: LLMClient, req: ChatRequest, tries: int = 3) -> tuple[dict, ChatResult]:
+    """Infrastructure helper: call and parse JSON; on invalid or truncated JSON, re-ask with a corrective note.
+
+    Each retry changes the request body, so it is a new ledger row rather than a cache hit of the bad answer.
+    """
+    last: Exception | None = None
+    base = list(req.messages)
+    for k in range(tries):
+        if k:
+            req.messages = base + [{"role": "user", "content":
+                                    "Your previous output was invalid or truncated JSON. Reply again with compact, "
+                                    "valid JSON only, shorter than before."}]
+            req.attempt = k
+        res = await client.chat(req)
+        try:
+            return json.loads(res.content), res
+        except json.JSONDecodeError as e:
+            last = e
+    raise LLMError(f"{req.purpose}: no valid JSON after {tries} tries: {last}")

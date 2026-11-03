@@ -1,0 +1,91 @@
+ticker: AAPL
+name: Apple Inc
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - AAPL
+  - Apple
+  - Apple Inc
+  products_and_brands:
+  - A20 Pro chip
+  - App Store
+  - Apple Ads
+  - Apple Arcade
+  - Apple Card
+  - Apple Intelligence
+  - Apple Maps
+  - Apple Music
+  - Apple Pay
+  - Apple TV
+  - Apple Watch
+  - Apple Watch Series 12
+  - Apple Watch Ultra 4
+  - C2 modem
+  - M5 chip
+  - Mac
+  - MacBook Neo
+  - MapKit for Automotive
+  - Siri
+  - Vision Pro
+  - iPad
+  - iPhone
+  - iPhone 17
+  - iPhone 17e
+  - iPhone 18
+  - iPhone 18 Pro
+  - iPhone Duo
+  executives:
+  - Alan Dye
+  - Elliott Hill
+  - Jennifer Newstead
+  - John Sculley
+  - John Ternus
+  - Jony Ive
+  - Steve Jobs
+  - Tim Cook
+  subsidiaries:
+  - Q.AI
+  - Q.ai
+  major_partners:
+  - Ford
+  - Foxconn
+  - Google
+  - Intel
+  - Masimo
+  - Nike
+  - OpenAI
+  - Perryman Company
+  - Qnity Electronics
+  - Qualcomm
+  - Roku
+  - Samsung
+  - TSMC
+  - Taiwan Semiconductor
+  - Tata Electronics
+  facilities_and_places:
+  - Apple Park
+  - Appleverse
+  - Cupertino
+  hand_seed:
+  - AAPL
+  - AirPods
+  - App Store
+  - Apple
+  - Apple Intelligence
+  - Apple Pay
+  - Apple Watch
+  - Cupertino
+  - Mac
+  - MacBook
+  - Siri
+  - Tim Cook
+  - Vision Pro
+  - iCloud
+  - iOS
+  - iPad
+  - iPhone
+  - macOS
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

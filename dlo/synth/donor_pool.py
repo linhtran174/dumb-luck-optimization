@@ -27,6 +27,8 @@ class SectorPool:
     relvol: list[np.ndarray]         # volume / median of previous 60 sessions
     pair_beta: float
     pair_sigma: float
+    real_beta: list[float]
+    real_sigma: list[float]
 
 
 def estimation_end() -> date:
@@ -52,6 +54,20 @@ def _ols(y: np.ndarray, x: np.ndarray) -> tuple[float, float, np.ndarray]:
     return float(coef[0]), float(coef[1]), resid
 
 
+AR_LAGS = 5
+
+
+def prewhiten(e: np.ndarray, lags: int = AR_LAGS) -> np.ndarray:
+    """AR(lags) innovations of a residual series, standardized. Removes linear serial dependence (which would
+    otherwise plant an unintended reversal/momentum signal in 'pure noise' assets) while keeping volatility
+    clustering, which lives in |e| rather than e."""
+    X = np.column_stack([e[lags - k - 1:len(e) - k - 1] for k in range(lags)])
+    yv = e[lags:]
+    phi, *_ = np.linalg.lstsq(np.column_stack([np.ones(len(yv)), X]), yv, rcond=None)
+    u = yv - np.column_stack([np.ones(len(yv)), X]) @ phi
+    return u / u.std(ddof=1)
+
+
 def market_returns(bars: pl.DataFrame) -> pl.DataFrame:
     m = config.universe()["market"]
     return (bars.filter(pl.col("symbol") == m).sort("session")
@@ -71,14 +87,15 @@ def build(bars: pl.DataFrame, end: date | None = None) -> dict[str, SectorPool]:
             if f.height < 250:
                 continue
             _, _, e = _ols(f["ret"].to_numpy(), f["mret"].to_numpy())
+            L = AR_LAGS
             donors.append(d)
-            dates.append(f["session"].to_list())
-            resid.append(e / e.std(ddof=1))
-            ret.append(f["ret"].to_numpy())
-            gap.append(f["gap"].to_numpy())
-            hi.append(f["hi"].to_numpy())
-            lo.append(f["lo"].to_numpy())
-            rv.append(f["relvol"].to_numpy())
+            dates.append(f["session"].to_list()[L:])
+            resid.append(prewhiten(e / e.std(ddof=1)))
+            ret.append(f["ret"].to_numpy()[L:])
+            gap.append(f["gap"].to_numpy()[L:])
+            hi.append(f["hi"].to_numpy()[L:])
+            lo.append(f["lo"].to_numpy()[L:])
+            rv.append(f["relvol"].to_numpy()[L:])
         betas, sigmas = [], []
         for c in sec["real"]:
             f = _features(hist, c["ticker"], spy)
@@ -86,5 +103,5 @@ def build(bars: pl.DataFrame, end: date | None = None) -> dict[str, SectorPool]:
             betas.append(b)
             sigmas.append(float(e.std(ddof=1)))
         pools[sector] = SectorPool(sector, donors, dates, resid, ret, gap, hi, lo, rv,
-                                   float(np.mean(betas)), float(np.mean(sigmas)))
+                                   float(np.mean(betas)), float(np.mean(sigmas)), betas, sigmas)
     return pools

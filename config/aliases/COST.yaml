@@ -1,0 +1,48 @@
+ticker: COST
+name: Costco Wholesale Corp
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - Costco
+  - Costco Wholesale
+  - Costco Wholesale Corp
+  - Costco Wholesale Corporation
+  products_and_brands:
+  - Costco Beauty Table
+  - Costco food court
+  - Costco gas stations
+  - Costco private-label motor oil
+  - Costco-Branded Medicare Plans
+  - Kirkland
+  - Kirkland Signature
+  executives:
+  - Ron Vachris
+  subsidiaries:
+  - Costco Australia
+  - Costco Taiwan
+  major_partners:
+  - ANTHBOT Genie 600E
+  - Coca-Cola
+  - FOCUSfactor
+  - Heavenly Hunks
+  - NationsBenefits
+  - PepsiCo
+  - SCAN Group
+  - Synergy CHC
+  - Urban Remedy
+  facilities_and_places:
+  - Bibb County
+  - Macon-Bibb County
+  - Tainan
+  hand_seed:
+  - COST
+  - Costco
+  - Craig Jelinek
+  - Kirkland
+  - Kirkland Signature
+  - Ron Vachris
+  - Vachris
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

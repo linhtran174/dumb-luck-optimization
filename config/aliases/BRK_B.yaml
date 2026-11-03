@@ -1,0 +1,68 @@
+ticker: BRK.B
+name: Berkshire Hathaway Inc (Class B)
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - BRK
+  - BRK-A
+  - BRK-B
+  - BRK.A
+  - BRK.B
+  - Berkshire
+  - Berkshire Hathaway
+  - Berkshire Hathaway Inc
+  - Berkshire Hathaway Inc. (Class B)
+  products_and_brands:
+  - Alleghany
+  - McLane
+  - McLane Company
+  - OxyChem
+  - Squishmallows
+  executives:
+  - Abel
+  - Buffett
+  - Charlie Munger
+  - Combs
+  - Greg Abel
+  - Gregory E. Abel
+  - Howard Buffett
+  - Howie Buffett
+  - Munger
+  - Todd Combs
+  - Warren Buffett
+  subsidiaries:
+  - BNSF
+  - Berkshire Hathaway Energy
+  - Berkshire Hathaway Specialty Insurance
+  - GEICO
+  major_partners:
+  - Aurora Innovation
+  - Bending Spoons
+  - Bill & Melinda Gates Foundation
+  - Bill Gates
+  - Gates Foundation
+  - JPMorgan
+  - JPMorgan Chase
+  - Jamie Dimon
+  - Taylor Morrison
+  - Taylor Morrison Home
+  facilities_and_places:
+  - Omaha
+  hand_seed:
+  - Ajit Jain
+  - BNSF
+  - BRK
+  - Berkshire
+  - Berkshire Hathaway
+  - Buffett
+  - Charlie Munger
+  - GEICO
+  - Geico
+  - Greg Abel
+  - Munger
+  - Omaha
+  - Warren Buffett
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

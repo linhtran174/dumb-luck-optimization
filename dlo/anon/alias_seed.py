@@ -1,0 +1,21 @@
+"""Hand-written alias seeds, merged with the DeepSeek-built lists before review."""
+SEED = {
+    "NVDA": ["NVIDIA", "Nvidia", "NVDA", "Jensen Huang", "Huang", "GeForce", "CUDA", "Blackwell", "Hopper", "Rubin",
+             "H100", "H200", "H20", "B200", "B300", "GB200", "GB300", "DGX", "Mellanox", "Grace Hopper", "NVLink"],
+    "AAPL": ["Apple", "AAPL", "iPhone", "iPad", "Mac", "MacBook", "Apple Watch", "AirPods", "Vision Pro", "App Store",
+             "iOS", "macOS", "Tim Cook", "Siri", "Apple Intelligence", "Cupertino", "Apple Pay", "iCloud"],
+    "BRK.B": ["Berkshire", "Berkshire Hathaway", "BRK", "Warren Buffett", "Buffett", "Greg Abel", "GEICO", "Geico",
+              "BNSF", "Charlie Munger", "Munger", "Omaha", "Ajit Jain"],
+    "JPM": ["JPMorgan", "JPMorgan Chase", "J.P. Morgan", "JP Morgan", "Chase", "JPM", "Jamie Dimon", "Dimon"],
+    "LLY": ["Eli Lilly", "Lilly", "LLY", "Mounjaro", "Zepbound", "tirzepatide", "orforglipron", "retatrutide",
+            "Kisunla", "donanemab", "Verzenio", "Jaypirca", "pirtobrutinib", "David Ricks", "Ricks", "Indianapolis"],
+    "JNJ": ["Johnson & Johnson", "Johnson and Johnson", "J&J", "JNJ", "Janssen", "Stelara", "Darzalex", "Tremfya",
+            "Carvykti", "Rybrevant", "Joaquin Duato", "Duato", "Kenvue", "Shockwave", "Abiomed", "Intra-Cellular",
+            "Caplyta", "talc"],
+    "XOM": ["Exxon", "ExxonMobil", "Exxon Mobil", "XOM", "Darren Woods", "Pioneer Natural Resources", "Guyana",
+            "Baytown"],
+    "CVX": ["Chevron", "CVX", "Mike Wirth", "Wirth", "Hess", "Tengiz", "Tengizchevroil", "Guyana"],
+    "WMT": ["Walmart", "Wal-Mart", "WMT", "Sam's Club", "Doug McMillon", "McMillon", "John Furner", "Furner",
+            "Flipkart", "Walmart+", "Bentonville"],
+    "COST": ["Costco", "COST", "Kirkland Signature", "Kirkland", "Ron Vachris", "Vachris", "Craig Jelinek"],
+}

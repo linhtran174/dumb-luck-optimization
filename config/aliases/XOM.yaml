@@ -1,0 +1,54 @@
+ticker: XOM
+name: Exxon Mobil Corp
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - Exxon
+  - Exxon Mobil
+  - Exxon Mobil Corp
+  - ExxonMobil
+  - ExxonMobil Holdings
+  - XOM
+  products_and_brands:
+  - FlexRobotics
+  - Hyjet
+  - Mobil
+  - Mobil Jet Oil
+  - Mobil Oil Australia
+  executives:
+  - Darren Woods
+  - Jack Williams
+  - Kathy Mikells
+  - Neil Hansen
+  subsidiaries:
+  - Mobil Oil Australia
+  major_partners:
+  - BYD
+  - Citgo Petroleum
+  - Helmerich & Payne
+  - Infosys
+  - Pioneer Natural Resources
+  - QatarEnergy
+  facilities_and_places:
+  - Cabo Delgado
+  - Guyana
+  - Joliet Refinery
+  - Kashagan
+  - Liza Unity
+  - Mozambique LNG
+  - Rovuma LNG
+  - Sakhalin 1
+  - West Qurna
+  hand_seed:
+  - Baytown
+  - Darren Woods
+  - Exxon
+  - Exxon Mobil
+  - ExxonMobil
+  - Guyana
+  - Pioneer Natural Resources
+  - XOM
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

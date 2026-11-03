@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from dlo.clients.openrouter_chat import ChatRequest, LLMClient, LLMError
+from dlo.clients.openrouter_chat import ChatRequest, LLMClient, LLMError, chat_json
 from dlo.store import RunStore, now_utc
 
 SECTOR_VOICE = {
@@ -76,14 +76,24 @@ async def generate_day(client: LLMClient, store: RunStore, asset: str, sector: s
         return [r["text_tokenized"] for r in rows if r["status"] == "ok"]
     prompt = build_prompt(asset, sector, day, n, event, event_type, z)
     texts: list[str] = []
-    status = "ok"
-    try:
-        res = await client.chat(ChatRequest(
-            model_key="deepseek", purpose="synth_news", budget="infra", sim_day=day, json_schema=GEN_SCHEMA,
-            max_tokens=900, messages=[{"role": "system", "content": GEN_SYSTEM}, {"role": "user", "content": prompt}]))
-        texts = [t.strip() for t in json.loads(res.content)["items"] if t.strip()][:n]
-    except (LLMError, json.JSONDecodeError, KeyError):
-        status = "error"
+    status = "error"
+    msgs = [{"role": "system", "content": GEN_SYSTEM}, {"role": "user", "content": prompt}]
+    for attempt in range(3):
+        try:
+            out, _ = await chat_json(client, ChatRequest(
+                model_key="deepseek", purpose="synth_news", budget="infra", sim_day=day, json_schema=GEN_SCHEMA,
+                max_tokens=900, attempt=attempt, messages=list(msgs)))
+            texts = [t.strip() for t in out["items"] if t.strip()][:n]
+            status = "ok"
+        except (LLMError, KeyError):
+            texts, status = [], "error"
+        if len(texts) == n:
+            break
+        # Some hosts occasionally return an empty array; re-ask (a new request, so not a cache hit).
+        msgs = msgs + [{"role": "user", "content": f"Your answer had {len(texts)} usable items. "
+                                                   f"Return exactly {n} non-empty items."}]
+    if len(texts) < n:
+        status = "error" if not texts else status
     from dlo.anon import aliases
     out = []
     for i, t in enumerate(texts or [""]):

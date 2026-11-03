@@ -1,0 +1,76 @@
+ticker: LLY
+name: Eli Lilly & Co
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - Eli Lilly
+  - Eli Lilly & Co
+  - Eli Lilly and Company
+  - LLY
+  - Lilly
+  products_and_brands:
+  - Ebglyss
+  - Employer Connect
+  - Foundayo
+  - Jaypirca
+  - Kisunla
+  - LillyDirect
+  - Mounjaro
+  - Olomorasib
+  - Omvoh
+  - Onswik
+  - Orforglipron
+  - Pirtobrutinib
+  - RE:SUMMIT
+  - Retatrutide
+  - Selpercatinib
+  - Sofetabart mipitecan
+  - Taltz
+  - TuneLab
+  - Verzenios
+  - Zepbound
+  - Zepbound KwikPen
+  executives:
+  - Dave Ricks
+  - David Ricks
+  - Ilya Yuffa
+  - Patrik Jonsson
+  subsidiaries:
+  - Lilly Global Markets
+  - Lilly International
+  major_partners:
+  - ABL Bio
+  - Adverum
+  - Alzheimer's Drug Discovery Foundation
+  - Amplia
+  - InduPro Therapeutics
+  - InnoCare Pharma
+  - Innovent
+  - Insilico Medicine
+  - NVIDIA
+  - Repertoire Immune
+  - Schrödinger
+  - Seamless Therapeutics
+  - Twist Bioscience
+  facilities_and_places: []
+  hand_seed:
+  - David Ricks
+  - Eli Lilly
+  - Indianapolis
+  - Jaypirca
+  - Kisunla
+  - LLY
+  - Lilly
+  - Mounjaro
+  - Ricks
+  - Verzenio
+  - Zepbound
+  - donanemab
+  - orforglipron
+  - pirtobrutinib
+  - retatrutide
+  - tirzepatide
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

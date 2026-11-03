@@ -8,10 +8,10 @@ import numpy as np
 import polars as pl
 
 from dlo import config, logs
-from dlo.anon.select import real_daily_counts
+from dlo.anon.pipeline import scrubbed_for_day
 from dlo.data import calendar
 from dlo.data.snapshot import Snapshot
-from dlo.store import now_utc, sha256_file
+from dlo.store import RunStore, now_utc, sha256_file
 from dlo.synth import donor_pool, generator
 
 log = logs.get("pregen")
@@ -34,13 +34,26 @@ def window_sessions() -> list[date]:
     return out
 
 
-def run(snap: Snapshot | None = None) -> dict:
+def real_scrubbed_counts(store: RunStore, snap: Snapshot, days: list[date]) -> pl.DataFrame:
+    """Per real asset-day count of news items that survive scrubbing, i.e. what agents actually see."""
+    rows, missing = [], 0
+    for d in days:
+        sc = scrubbed_for_day(store, snap, d)
+        missing += sc["missing"]
+        rows += [{"session": d, "ticker": t, "n": len(v)} for t, v in sc["assets"].items()]
+    if missing:
+        raise RuntimeError(f"{missing} selected news items are not scrubbed yet; run `dlo anon scrub all` first")
+    return pl.DataFrame(rows)
+
+
+def run(snap: Snapshot | None = None, store: RunStore | None = None) -> dict:
     snap = snap or Snapshot()
+    store = store or RunStore()
     PREGEN_DIR.mkdir(parents=True, exist_ok=True)
     pools = donor_pool.build(snap.bars)
     seed = config.universe()["synthetic"]["seed"]
     specs = generator.make_specs(pools, seed)
-    counts = real_daily_counts(snap, window_sessions())
+    counts = real_scrubbed_counts(store, snap, window_sessions())
     counts.write_parquet(PREGEN_DIR / "real_news_counts.parquet")
     real_counts = counts["n"].to_numpy()
     mret = dict(zip(*donor_pool.market_returns(snap.bars).select("session", "mret").to_dict(as_series=False).values()))

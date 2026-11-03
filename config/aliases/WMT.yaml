@@ -1,0 +1,59 @@
+ticker: WMT
+name: Walmart Inc
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - Wal-Mart
+  - Walmart
+  - Walmart Inc
+  products_and_brands:
+  - 20x25
+  - Agent Gateway
+  - Agent Profiles
+  - Every Day Low Prices
+  - Great Value
+  - Sam's Club Plus
+  - Sparky
+  - Walmart+
+  executives:
+  - Bill Simon
+  - Doug McMillon
+  - Sam Walton
+  subsidiaries:
+  - Sam's Club
+  - Walmart Canada
+  - Walmart Healthcare Research Institute
+  major_partners:
+  - Affirm
+  - Apple Pay
+  - Base Power
+  - Care Access
+  - ChatGPT
+  - DoorDash
+  - Gemini
+  - Google
+  - OpenAI
+  - Papa John's
+  - Plug Power
+  - Rivian
+  - Subway
+  - Tori Wesszer
+  facilities_and_places:
+  - Bentonville, Arkansas
+  - Stockton, CA
+  hand_seed:
+  - Bentonville
+  - Doug McMillon
+  - Flipkart
+  - Furner
+  - John Furner
+  - McMillon
+  - Sam's Club
+  - WMT
+  - Wal-Mart
+  - Walmart
+  - Walmart+
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

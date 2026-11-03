@@ -1,0 +1,51 @@
+ticker: JPM
+name: JPMorgan Chase & Co
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - J.P. Morgan
+  - JP Morgan
+  - JP Morgan Chase
+  - JPM
+  - JPMorgan
+  - JPMorgan Chase
+  - JPMorgan Chase & Co
+  - JPMorganChase
+  products_and_brands:
+  - 55ip
+  - ActiveTax Technology
+  - Chase
+  - J.P. Morgan Asset Management
+  - JPMorgan Asset Management
+  executives:
+  - David Kelly
+  - Dimon
+  - Doug Petno
+  - Jamie Dimon
+  - Jeremy Barnum
+  - Marianne Lake
+  - Todd Combs
+  subsidiaries:
+  - JPMorgan Chase Bank, N.A
+  major_partners:
+  - Antin
+  - Berkshire Hathaway
+  - QIA
+  - Qatar Investment Authority
+  - VICI Properties
+  facilities_and_places:
+  - London HQ
+  - New York headquarters
+  hand_seed:
+  - Chase
+  - Dimon
+  - J.P. Morgan
+  - JP Morgan
+  - JPM
+  - JPMorgan
+  - JPMorgan Chase
+  - Jamie Dimon
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'

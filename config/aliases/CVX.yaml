@@ -1,0 +1,86 @@
+ticker: CVX
+name: Chevron Corp
+status: reviewed_frozen
+terms:
+  legal_and_common_names:
+  - Chevron
+  - Chevron Corp
+  - Chevron Corporation
+  products_and_brands:
+  - Caltex
+  - Chevron
+  - Delo
+  - Harmattan Energy
+  - Havoline
+  - Star Deep Water
+  - Techron
+  - Texaco
+  executives:
+  - Bonner
+  - Eimear Bonner
+  - Gustavson
+  - Jeff Gustavson
+  - Mike Wirth
+  - Wirth
+  subsidiaries:
+  - Chevron Australia
+  - Chevron New Energies
+  - Chevron Products Company
+  - Chevron Shipping
+  - Chevron U.S.A
+  - Harmattan Energy
+  - Star Deep Water
+  major_partners:
+  - CPC
+  - Eneos
+  - Eni
+  - Keo Capital
+  - Kosmos Energy
+  - Lukoil
+  - Motiva
+  - OXY
+  - Occidental Petroleum
+  - PDVSA
+  - Petroindependencia
+  - Primavera
+  - Quantum Capital Group
+  - SLB
+  - Schlumberger
+  - TCO
+  - Tengizchevroil
+  - TotalEnergies
+  - Woodside
+  facilities_and_places:
+  - Angola Block
+  - Bandit well
+  - CPC
+  - CVX
+  - Caspian Pipeline Consortium
+  - El Segundo Refinery
+  - Gorgon
+  - Gorgon Stage 3
+  - Greece offshore blocks
+  - Kashagan
+  - Leviathan
+  - Malaysia solar project
+  - Namibia PEL 90
+  - Nebraska Live Oak project
+  - PPL 2000
+  - PPL 2001
+  - Tengiz
+  - Vaca Muerta
+  - West Delta basin
+  - West Qurna 2
+  hand_seed:
+  - CVX
+  - Chevron
+  - Guyana
+  - Hess
+  - Mike Wirth
+  - Tengiz
+  - Tengizchevroil
+  - Wirth
+review_note: 'Hand-reviewed 2026-11-03: removed countries, regions, basins, index
+  names, media outlets, commentators and generic concepts that do not identify this
+  company; NVDA partner list replaced with a curated list (DeepSeek returned ~200
+  co-mentioned entities).'
