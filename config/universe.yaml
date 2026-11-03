@@ -1,0 +1,45 @@
+# Selection rule: two largest companies by S&P 500 weight in each sector, from the last SPY
+# holdings disclosure before 2026-03-02: SEC N-PORT-P filed 2026-02-26, period 2025-12-31
+# (accession 0001410368-26-020131; copy at data/raw/universe/spy_nport_2025-12-31.xml).
+disclosure: {form: NPORT-P, period: 2025-12-31, filed: 2026-02-26, accession: 0001410368-26-020131}
+market: SPY
+sectors:
+  information_technology:
+    driver: AI capex, growth multiples
+    real:
+      - {ticker: NVDA, name: NVIDIA Corp, weight_pct: 7.755}
+      - {ticker: AAPL, name: Apple Inc, weight_pct: 6.874}
+    donors: [MSFT, AVGO, ORCL, MU, CSCO, IBM, CRM, AMD]
+  financials:
+    driver: Rates, credit, payment volumes
+    real:
+      - {ticker: BRK.B, name: Berkshire Hathaway Inc (Class B), weight_pct: 1.577}
+      - {ticker: JPM, name: JPMorgan Chase & Co, weight_pct: 1.501}
+    donors: [V, MA, BAC, WFC, GS, MS, C, AXP]
+  health_care:
+    driver: Drug pipelines, policy
+    real:
+      - {ticker: LLY, name: Eli Lilly & Co, weight_pct: 1.460}
+      - {ticker: JNJ, name: Johnson & Johnson, weight_pct: 0.853}
+    donors: [ABBV, UNH, MRK, ABT, TMO, ISRG, AMGN, PFE]
+  energy:
+    driver: Oil and gas prices
+    real:
+      - {ticker: XOM, name: Exxon Mobil Corp, weight_pct: 0.868}
+      - {ticker: CVX, name: Chevron Corp, weight_pct: 0.494}
+    donors: [COP, EOG, SLB, PSX, MPC, WMB, OXY, KMI]
+  consumer_staples:
+    driver: Defensive consumer demand
+    real:
+      - {ticker: WMT, name: Walmart Inc, weight_pct: 0.836}
+      - {ticker: COST, name: Costco Wholesale Corp, weight_pct: 0.654}
+    donors: [PG, KO, PM, PEP, MDLZ, CL, MO, KMB]
+market_news_symbols: [SPY, QQQ, DIA, IWM]
+synthetic:
+  seed: 20260302
+  groups:
+    noise: {count: 4}
+    momentum: {strengths: [0.05, 0.10, 0.20]}
+    news_lead: {strengths: [0.05, 0.10, 0.20]}
+  event_day_prob: 0.20
+  bootstrap_mean_block: 10

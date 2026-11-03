@@ -1,0 +1,7 @@
+arms:
+  BLIND-FULL:      {memo: none,     seeds: 3, models: [terra, luna]}
+  REVISE:          {memo: true,     seeds: 2, models: [terra, luna]}
+  REVISE-SHUFFLED: {memo: shuffled, seeds: 2, models: [terra, luna]}
+revise_every_days: 10
+# Trial-only override so the revise loop runs twice inside 5 days. Never applied to `test`.
+trial_overrides: {revise_every_days: 2}

@@ -1,0 +1,11 @@
+lookback_days: 60
+decision_cutoff_et: "18:00"
+windows:
+  dev:   {start: 2025-12-01, end: 2026-02-13, reported: false}
+  trial: {start: 2025-12-01, end: 2025-12-05, reported: false}   # 5-day pre-run trial (replaces 50-day dress rehearsal)
+  test:  {start: 2026-03-02, end: 2026-10-30, reported: true}
+snapshot:
+  bars_start: 2023-08-01      # 2 years of donor history plus lookbacks
+  bars_end: 2026-11-02        # one session past the test window (Nov 3 still trading at fetch time; free plan blocks recent SIP)
+  news_start: 2025-11-28
+  news_end: 2026-10-30

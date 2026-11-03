@@ -1,0 +1,11 @@
+capital_usd: 1000.0
+max_weight: 0.30
+trading_cost_bps: 5.0          # per side
+weight_sum_tolerance: 0.01
+max_retries: 2
+# Hard spend caps (USD) per window, enforced against the persisted LLM ledger before every uncached call.
+spend_caps_usd:
+  trial: 30.0
+  dev: 80.0
+  test: 260.0
+  infra: 25.0                  # scrubber, alias build, synthetic news, probes, G0, judge (all windows)

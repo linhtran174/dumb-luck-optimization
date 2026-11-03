@@ -1,0 +1,38 @@
+# Pinned model registry. Never use `latest` aliases.
+# `slug` is sent to OpenRouter; responses must echo a model id that matches `expect_model`.
+models:
+  terra:
+    role: evaluated
+    slug: openai/gpt-5.6-terra-20260709
+    list_price_per_m: {input: 2.00, output: 12.00}
+    knowledge_cutoff: 2026-02-16
+    reasoning_effort: medium
+    max_tokens: 16000
+    temperature: null          # provider default
+    structured_outputs: true
+    provider: {order: [openai], allow_fallbacks: false, require_parameters: true}
+    max_concurrency: 6
+  luna:
+    role: evaluated
+    slug: openai/gpt-5.6-luna-20260709
+    list_price_per_m: {input: 0.20, output: 1.20}
+    knowledge_cutoff: 2026-02-16
+    reasoning_effort: medium
+    max_tokens: 16000
+    temperature: null
+    structured_outputs: true
+    provider: {order: [openai], allow_fallbacks: false, require_parameters: true}
+    max_concurrency: 8
+  deepseek:
+    role: infrastructure
+    # Earliest dated snapshot (Apr 23, 2026 release). 0731 is a re-post-trained revision; not used.
+    slug: deepseek/deepseek-v4-flash-20260423
+    list_price_per_m: {input: 0.09, output: 0.18}
+    knowledge_cutoff: null
+    reasoning_effort: null     # infra jobs run without extended reasoning
+    max_tokens: 4000
+    temperature: 0.0
+    structured_outputs: true
+    # fp8 providers that support structured outputs; no fallback outside this list.
+    provider: {order: [deepinfra, streamlake, fireworks, crusoe], allow_fallbacks: false, require_parameters: true}
+    max_concurrency: 16
