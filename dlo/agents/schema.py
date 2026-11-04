@@ -17,13 +17,12 @@ def decision_json_schema() -> dict:
     num = {"type": "number"}
     return {"name": "portfolio_decision", "strict": True, "schema": {
         "type": "object", "additionalProperties": False,
-        "required": ["scores", "weights", "cash", "confidence", "next_review_in_days", "rationale", "market_view"],
+        "required": ["scores", "weights", "confidence", "next_review_in_days", "rationale", "market_view"],
         "properties": {
             "scores": {"type": "object", "additionalProperties": False, "required": LABELS,
                        "properties": {k: num for k in LABELS}},
             "weights": {"type": "object", "additionalProperties": False, "required": LABELS,
                         "properties": {k: num for k in LABELS}},
-            "cash": num,
             "confidence": num,
             "next_review_in_days": {"type": "integer", "enum": REVIEW_CHOICES},
             "rationale": {"type": "object", "additionalProperties": False, "required": LABELS,
@@ -36,7 +35,7 @@ def decision_json_schema() -> dict:
 class Decision:
     scores: dict[str, float]
     weights: dict[str, float]
-    cash: float
+    cash: float                     # derived: 1 - sum(weights); not part of the model's output
     confidence: float
     next_review_in_days: int
     rationale: dict[str, str]
@@ -64,7 +63,10 @@ def _trim(s: str, n: int) -> str:
 
 def validate(content: str) -> Decision:
     """Parse and validate. Hard failures raise ValidationFailed (the agent gets a retry);
-    soft issues (sum within tolerance, over-long text) are normalized and flagged."""
+    soft issues (sum within tolerance, over-long text) are normalized and flagged.
+
+    Cash is not an output field (G5 fix after the trial: models misstated it): it is 1 minus the asset weights,
+    so the only sum constraint is that the weights add up to at most 1 (+ tolerance)."""
     cap = config.costs()["max_weight"]
     tol = config.costs()["weight_sum_tolerance"]
     try:
@@ -89,7 +91,6 @@ def validate(content: str) -> Decision:
     try:
         scores = {k: float(d["scores"][k]) for k in LABELS}
         weights = {k: float(d["weights"][k]) for k in LABELS}
-        cash = float(d["cash"])
         conf = float(d["confidence"])
         nr = int(d["next_review_in_days"])
     except (TypeError, ValueError, KeyError) as e:
@@ -98,14 +99,14 @@ def validate(content: str) -> Decision:
     if bad_s:
         errs.append(f"scores must be in [-1, 1]: {bad_s}")
     neg = [k for k, v in weights.items() if v < 0]
-    if neg or cash < 0:
-        errs.append(f"weights and cash must be >= 0 (long-only): {neg + (['cash'] if cash < 0 else [])}")
+    if neg:
+        errs.append(f"weights must be >= 0 (long-only): {neg}")
     over = [k for k, v in weights.items() if v > cap + 1e-6]
     if over:
         errs.append(f"weights above the {cap:.0%} cap: {over}")
-    total = sum(weights.values()) + cash
-    if abs(total - 1.0) > tol:
-        errs.append(f"weights plus cash sum to {total:.4f}; must be 1 +/- {tol}")
+    total = sum(weights.values())
+    if total > 1.0 + tol:
+        errs.append(f"asset weights sum to {total:.4f}; must be at most 1 (the rest is cash)")
     if not 0.0 <= conf <= 1.0:
         errs.append("confidence must be in [0, 1]")
     if nr not in REVIEW_CHOICES:
@@ -117,15 +118,11 @@ def validate(content: str) -> Decision:
     if errs:
         raise ValidationFailed("; ".join(errs))
 
-    if abs(total - 1.0) > 1e-9:
+    if total > 1.0:
         weights = {k: v / total for k, v in weights.items()}
-        cash = cash / total
         flags.append(f"renormalized_sum_{total:.4f}")
-        excess = sum(max(0.0, v - cap) for v in weights.values())
-        if excess > 0:
-            weights = {k: min(v, cap) for k, v in weights.items()}
-            cash += excess
-            flags.append("clipped_cap_after_renorm")
+    weights = {k: min(v, cap) for k, v in weights.items()}
+    cash = max(0.0, 1.0 - sum(weights.values()))
     for k, v in rationale.items():
         if _words(v) > RATIONALE_WORDS:
             rationale[k] = _trim(v, RATIONALE_WORDS)

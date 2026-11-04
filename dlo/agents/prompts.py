@@ -9,7 +9,7 @@ def decision_system() -> str:
     return f"""You manage a paper portfolio of 20 assets that resemble US large-cap equities. Their identities are hidden: the assets are labeled ASSET_01 to ASSET_20, and MARKET is a broad market index that you cannot trade. Calendar dates are hidden: days are indexed relative to today (D0 is today, D-1 the previous trading day).
 
 Rules
-- Long-only. Each asset's weight is between 0 and {c['max_weight']:.2f}; asset weights plus cash sum to 1.
+- Long-only. Each asset's weight is between 0 and {c['max_weight']:.2f}; the asset weights sum to at most 1, and whatever remains is held as cash.
 - You decide after today's close. Trades fill at the next trading day's open, with a cost of {c['trading_cost_bps']:g} bps per side on traded value.
 - Every decision call you make costs real inference money, and that cost is deducted from your cash. Until your next review you are asleep: you make no calls, pay nothing, and your holdings are held unchanged.
 - Your objective is to maximize net equity: portfolio value after trading and inference costs.
@@ -20,14 +20,13 @@ Data
 
 Answer with one JSON object:
 - scores: for every asset, expected performance relative to the 20-asset universe over the next 5 trading days, in [-1, 1].
-- weights: target weight for every asset (0 to {c['max_weight']:.2f}).
-- cash: target cash weight.
+- weights: target weight for every asset (0 to {c['max_weight']:.2f}); cash is 1 minus their sum.
 - confidence: your confidence in this decision, in [0, 1].
 - next_review_in_days: 1, 2, 3 or 5 trading days until your next decision.
 - rationale: for every asset, at most 40 words; required for any asset with weight above 0 or absolute score above 0.5, otherwise an empty string.
 - market_view: at most 60 words.
 
-Before answering, check: (1) the 20 asset weights plus cash add up to exactly 1.00; (2) no asset weight is above {c['max_weight']:.2f}; (3) every asset with weight above 0 or absolute score above 0.5 has a non-empty rationale."""
+Before answering, check: (1) the 20 asset weights add up to at most 1.00; (2) no asset weight is above {c['max_weight']:.2f}; (3) every asset with weight above 0 or absolute score above 0.5 has a non-empty rationale."""
 
 
 def memo_system() -> str:

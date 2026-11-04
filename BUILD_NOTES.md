@@ -108,10 +108,12 @@ test-window probe weeks, both models would drop AAPL, LLY and NVDA; 34 weeks giv
 - G3: zero regex hits in accepted text (pass). Probe re-identification **fails** (trial-v1: 80% Luna, 70% Terra;
   after scrub v2: 40% and 52% on test-window weeks). Leak accepted by the principal; see Anonymization above.
 - G2 after scrub v2: 66% (Luna) and 72% (Terra) on test-window weeks, against 50% +/- 10 (fail).
-- G5: 82.8% first-try valid in trial-v1 (Terra 71%, Luna 93%). After adding a self-check line to the prompt,
-  92.6% in trial-v2-g5 (27 decisions). The remaining failures are all weights plus cash summing to 1.03-1.12.
-  Recommended fix (not applied; it changes the output protocol): drop `cash` from the schema and derive it as
-  1 minus the weights.
+- G5: 82.8% first-try valid in trial-v1 (Terra 71%, Luna 93%); 92.6% in trial-v2-g5 after a prompt self-check.
+  Then (principal-approved protocol change) `cash` was **removed from the output**: it is derived as 1 minus the
+  asset weights, and the only sum rule is weights <= 1 + 0.01. Re-validating all 56 earlier first-try responses
+  offline: 96.4%. Confirmation trial trial-v3-g5 (28 decisions, v2 news): **96.4% (27/28; Terra 100%, Luna 93%)**,
+  still below 98%. The one failure is a missing rationale for an asset with |score| > 0.5; the charged retry fixed it.
+  At n=28 a single failure fails a 98% gate. Not relaxed.
 - States: max 24.0 KB, mean 22.2 KB (pass).
 - Judge kappa: needs at least 200 human-labeled rationales: `dlo analyze export-judge trial-v1`.
 
