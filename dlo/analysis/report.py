@@ -22,7 +22,9 @@ def _news_counts(store: RunStore, rd: metrics.RunData) -> dict[tuple[str, date],
         sc = scrubbed_for_day(store, rd.view_snap, d)
         for k, v in sc["assets"].items():
             out[(k, d)] = len(v)
-    for r in store.query("SELECT asset, sim_day, COUNT(*) n FROM synth_news WHERE status='ok' GROUP BY 1, 2"):
+    from dlo.anon.scrub import SCRUB_VERSION
+    for r in store.query("SELECT asset, sim_day, COUNT(*) n FROM synth_news WHERE status='ok' AND item_id LIKE ? "
+                         "GROUP BY 1, 2", (f"{SCRUB_VERSION}:%",)):
         out[(r["asset"], date.fromisoformat(r["sim_day"]))] = r["n"]
     return out
 

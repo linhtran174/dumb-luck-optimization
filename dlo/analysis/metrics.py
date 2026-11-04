@@ -215,7 +215,9 @@ def gate_checks(rd: RunData) -> dict:
         g3[m] = {"reidentification_rate": reid, "n": len(real_ps), "pass": reid is not None and reid <= 0.20}
     from dlo.anon import aliases
     hits = 0
-    for r in rd.store.query("SELECT text_tokenized FROM news_scrubbed WHERE status='ok'"):
+    from dlo.anon.scrub import SCRUB_VERSION
+    for r in rd.store.query("SELECT text_tokenized FROM news_scrubbed WHERE status='ok' AND news_id LIKE ?",
+                            (f"{SCRUB_VERSION}:%",)):
         hits += bool(aliases.leak_hits(r["text_tokenized"]))
     sizes = [d["state_bytes"] for d in dec]
     return {"G5": {"valid_first_share": first / n if n else None, "n": n, "pass": n > 0 and first / n >= 0.98,

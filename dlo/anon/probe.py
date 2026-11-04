@@ -36,7 +36,9 @@ def schema() -> dict:
 SYSTEM = """You are shown anonymized daily data and rewritten news for one asset, labeled ASSET_X, alongside a broad market index (MARKET). The asset is either one of ten real US large-cap companies or a synthetic asset generated to resemble one. Identify it if you can."""
 
 
-def probe_message(view_upto: pl.DataFrame, day, key: str, news_week: list[str]) -> str:
+def probe_message(view_upto: pl.DataFrame, day, key: str, news_week: list[str], variant: str = "full") -> str:
+    """variant: full (data and news, the plan's probe), data (no news) or news (no data); the last two are
+    diagnostics that split the re-identification rate by channel."""
     tables = lookback_table(view_upto, day, 60)
     lines = []
     for k, name in ((MARKET_KEY, "MARKET"), (key, PROBE_LABEL)):
@@ -46,14 +48,17 @@ def probe_message(view_upto: pl.DataFrame, day, key: str, news_week: list[str]) 
                   f" rvol  {_series(g['rel_vol'].to_list())}"]
     news = [f"- {render(t, {key: PROBE_LABEL})}" for t in news_week] or ["- (none)"]
     opts = "\n".join(f"- {o}" for o in options())
-    return ("DATA (last 60 trading days, oldest to newest)\n" + "\n".join(lines) +
-            "\n\nNEWS ABOUT ASSET_X (last 5 trading days)\n" + "\n".join(news) +
-            f"\n\nWhich is ASSET_X? Choose identity from:\n{opts}\nAlso give your best forced choice: real or synthetic.")
+    data = "DATA (last 60 trading days, oldest to newest)\n" + "\n".join(lines)
+    news_s = "NEWS ABOUT ASSET_X (last 5 trading days)\n" + "\n".join(news)
+    body = {"full": data + "\n\n" + news_s, "data": data + "\n\nNEWS ABOUT ASSET_X: not shown",
+            "news": "DATA: not shown\n\n" + news_s}[variant]
+    return (body + f"\n\nWhich is ASSET_X? Choose identity from:\n{opts}\n"
+            "Also give your best forced choice: real or synthetic.")
 
 
 async def run_probe(client: LLMClient, store: RunStore, run_id: str, week: int, day, view_upto: pl.DataFrame,
                     keys: list[str], news_by_key: dict[str, list[str]], synthetic_keys: set[str],
-                    models: list[str]) -> list[dict]:
+                    models: list[str], variant: str = "full") -> list[dict]:
     import asyncio
     names = {c["ticker"]: c["name"] for s in config.universe()["sectors"].values() for c in s["real"]}
 
@@ -61,7 +66,7 @@ async def run_probe(client: LLMClient, store: RunStore, run_id: str, week: int, 
         pid = f"{run_id}:{week}:{model}:{key}"
         if store.query("SELECT 1 FROM probes WHERE probe_id=?", (pid,)):
             return None
-        msg = probe_message(view_upto, day, key, news_by_key.get(key, []))
+        msg = probe_message(view_upto, day, key, news_by_key.get(key, []), variant)
         try:
             out = await client.chat(ChatRequest(
                 model_key=model, purpose="probe", budget="infra", sim_day=str(day), json_schema=schema(),

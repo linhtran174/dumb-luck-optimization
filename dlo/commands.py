@@ -195,6 +195,24 @@ def gate_g0(forced: bool = False) -> None:
                                                    for m, r in res["models"].items()}}, indent=1))
 
 
+@gate_app.command("g3")
+def gate_g3(window: str = typer.Option("dev"), weeks: int = 6, variant: str = typer.Option("full", help="full | data | news"),
+            models: str = "terra,luna", real_only: bool = False, skip_weeks: int = 0) -> None:
+    """Re-identification (G3) and real-vs-synthetic (G2) probe over several weeks of a window."""
+    from dlo.anon import g3
+
+    async def run():
+        c = _client()
+        try:
+            return await g3.run(c, window, weeks, variant, models.split(","), real_only, skip_weeks)
+        finally:
+            await c.aclose()
+
+    res = asyncio.run(run())
+    _write_gate(f"G3_{window}_{variant}", res)
+    typer.echo(json.dumps(res, indent=1))
+
+
 run_app = typer.Typer(help="M7 replay runner")
 app.add_typer(run_app, name="run")
 

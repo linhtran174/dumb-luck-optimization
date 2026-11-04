@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import date
 
 from dlo import logs
-from dlo.anon.scrub import scrub_item
+from dlo.anon.scrub import news_id, scrub_item
 from dlo.anon.select import select_for_day
 from dlo.clients.openrouter_chat import LLMClient
 from dlo.data.snapshot import Snapshot
@@ -43,7 +43,7 @@ def scrubbed_for_day(store: RunStore, snap: Snapshot, day: date) -> dict:
     out: dict = {"assets": {}, "market": [], "missing": 0}
 
     def get(kind: str, subject: str | None, item: dict) -> str | None:
-        nid = f"{kind}:{subject or 'MKT'}:{item['id']}"
+        nid = news_id(kind, subject, item["id"])
         r = store.query("SELECT status, text_tokenized FROM news_scrubbed WHERE news_id=?", (nid,))
         if not r:
             out["missing"] += 1

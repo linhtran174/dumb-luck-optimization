@@ -26,7 +26,7 @@ from dlo.agents.llm_agent import decide
 from dlo.agents.state import MAX_STATE_BYTES, TrajState, build_user_message, permutation_labels, state_hash
 from dlo.anon.pipeline import scrubbed_for_day
 from dlo.anon.probe import run_probe
-from dlo.anon.scrub import scrub_item
+from dlo.anon.scrub import SCRUB_VERSION, scrub_item
 from dlo.anon.select import select_for_day
 from dlo.clients.openrouter_chat import LLMClient
 from dlo.data import calendar
@@ -34,7 +34,7 @@ from dlo.data.snapshot import Snapshot
 from dlo.data.universe_view import UniverseView, asset_keys
 from dlo.sim.execution import charge_compute, check_ruin, equity, execute, expected_call_cost
 from dlo.store import RunStore, canonical_json, now_utc
-from dlo.synth.news_gen import generate_day
+from dlo.synth.news_gen import generate_day, stored_texts
 
 log = logs.get("replay")
 DEFAULT_CALL_COST = {"terra": 0.12, "luna": 0.012}
@@ -151,7 +151,7 @@ class Replay:
         if start == 0:
             self.store.put("runs", {"run_id": cfg.run_id, "window": cfg.window, "started_at": now_utc(),
                                     "finished_at": None, "status": "running", "git_commit": git_commit(),
-                                    "config_json": canonical_json({"days": [str(self.days[0]), str(self.days[-1])],
+                                    "config_json": canonical_json({"scrub_version": SCRUB_VERSION, "days": [str(self.days[0]), str(self.days[-1])],
                                                                    "trajectories": [t.traj_id for t in cfg.trajectories],
                                                                    "revise_every": cfg.revise_every,
                                                                    "budget": cfg.budget}),
@@ -307,8 +307,7 @@ class Replay:
             sc = scrubbed_for_day(self.store, self.snap, d)
             for k, v in sc["assets"].items():
                 news_week.setdefault(k, []).extend(v)
-            for r in self.store.query("SELECT asset, text_tokenized FROM synth_news WHERE sim_day=? AND status='ok'",
-                                      (d.isoformat(),)):
-                news_week.setdefault(r["asset"], []).append(r["text_tokenized"])
+            for k, v in stored_texts(self.store, d.isoformat()).items():
+                news_week.setdefault(k, []).extend(v)
         await run_probe(self.client, self.store, self.cfg.run_id, week, day, view_upto, self.keys, news_week,
                         set(self.specs), self.cfg.probe_models)
