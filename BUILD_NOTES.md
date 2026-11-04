@@ -113,7 +113,8 @@ test-window probe weeks, both models would drop AAPL, LLY and NVDA; 34 weeks giv
   asset weights, and the only sum rule is weights <= 1 + 0.01. Re-validating all 56 earlier first-try responses
   offline: 96.4%. Confirmation trial trial-v3-g5 (28 decisions, v2 news): **96.4% (27/28; Terra 100%, Luna 93%)**,
   still below 98%. The one failure is a missing rationale for an asset with |score| > 0.5; the charged retry fixed it.
-  At n=28 a single failure fails a 98% gate. Not relaxed.
+  At n=28 a single failure fails a 98% gate. Not relaxed. The principal accepted G5 at 96% (Nov 4): no further
+  protocol change; the charged retry handles the rare missing rationale.
 - States: max 24.0 KB, mean 22.2 KB (pass).
 - Judge kappa: needs at least 200 human-labeled rationales: `dlo analyze export-judge trial-v1`.
 
