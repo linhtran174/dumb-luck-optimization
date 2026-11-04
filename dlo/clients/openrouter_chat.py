@@ -95,7 +95,7 @@ class OpenRouterClient:
                  max_http_attempts: int = 6):
         self.ledger = ledger
         self.api_key = api_key or config.secret("OPENROUTER_API_KEY")
-        self.http = httpx.AsyncClient(timeout=httpx.Timeout(timeout_s, connect=30.0))
+        self.http = httpx.AsyncClient(timeout=httpx.Timeout(timeout_s, connect=30.0, write=60.0))
         self.max_http_attempts = max_http_attempts
         self._sems: dict[str, asyncio.Semaphore] = {}
         self._reserved: dict[str, float] = {}
