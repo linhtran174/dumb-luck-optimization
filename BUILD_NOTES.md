@@ -115,6 +115,9 @@ test-window probe weeks, both models would drop AAPL, LLY and NVDA; 34 weeks giv
   still below 98%. The one failure is a missing rationale for an asset with |score| > 0.5; the charged retry fixed it.
   At n=28 a single failure fails a 98% gate. Not relaxed. The principal accepted G5 at 96% (Nov 4): no further
   protocol change; the charged retry handles the rare missing rationale.
+- G1 and G2 accepted as failed by the principal (Nov 4) and the test run launched: synthetic price realism
+  (AUC 0.626) and the real-vs-synthetic probe (66% / 72%) are reported as failed; criteria not relaxed. The
+  synthetic-asset results (planted-signal detection, noise confabulation) carry that caveat.
 - States: max 24.0 KB, mean 22.2 KB (pass).
 - Judge kappa: needs at least 200 human-labeled rationales: `dlo analyze export-judge trial-v1`.
 
