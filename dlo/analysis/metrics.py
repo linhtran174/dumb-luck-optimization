@@ -57,13 +57,45 @@ class RunData:
             return np.nan
 
 
-def ic_metrics(rd: RunData) -> dict:
-    real = config.real_tickers()
+# Robustness rule (fixed before the test run, after G3 failed and the principal accepted the leak): per model, drop
+# every asset that model's weekly probes identify above chance, one-sided binomial test at 5%.
+#   real asset: named correctly more often than 10% (1 in 10 companies, the plan's chance level)
+#   synthetic asset: called "synthetic" in the forced real/synthetic choice more often than 50%
+ID_ALPHA = 0.05
+ID_CHANCE_REAL = 0.10
+ID_CHANCE_SYNTH = 0.50
+
+
+def identified_assets(store: RunStore, run_id: str, alpha: float = ID_ALPHA) -> dict[str, dict]:
+    rows = [dict(r) for r in store.query("SELECT * FROM probes WHERE run_id=?", (run_id,))]
+    out: dict[str, dict] = {}
+    for m in sorted({r["model_key"] for r in rows}):
+        per: dict[str, dict] = {}
+        for k in sorted({r["asset_key"] for r in rows if r["model_key"] == m}):
+            ps = [r for r in rows if r["model_key"] == m and r["asset_key"] == k
+                  and not str(r["answer"]).startswith("error")]
+            if not ps:
+                continue
+            if ps[0]["is_synthetic"]:
+                hits, p0 = sum(r["answer_synthetic"] == "synthetic" for r in ps), ID_CHANCE_SYNTH
+            else:
+                hits, p0 = sum(r["answer"] == r["truth"] for r in ps), ID_CHANCE_REAL
+            pv = float(stats.binomtest(hits, len(ps), p0, alternative="greater").pvalue)
+            per[k] = {"n": len(ps), "hits": hits, "rate": hits / len(ps), "p": pv, "identified": pv < alpha}
+        out[m] = {"assets": per, "identified": sorted(k for k, v in per.items() if v["identified"])}
+    return out
+
+
+def ic_metrics(rd: RunData, exclude: dict[str, set[str]] | None = None) -> dict:
+    """IC (real assets) and planted-signal detection (synthetic assets). `exclude` maps a model key to the assets
+    dropped for that model's trajectories (robustness rule); with fewer than 5 real assets left IC is skipped."""
     out: dict = defaultdict(lambda: defaultdict(list))
     for dec in rd.decisions:
         if not dec["decision_json"]:
             continue
         st = rd.states[dec["trajectory_id"]]
+        drop = (exclude or {}).get(st.model_key, set())
+        real = [k for k in config.real_tickers() if k not in drop]
         l2k = st.label_to_key()
         d = json.loads(dec["decision_json"])
         day = pl.Series([dec["sim_day"]]).str.to_date()[0]
@@ -72,16 +104,18 @@ def ic_metrics(rd: RunData) -> dict:
             xs = [sc[k] for k in real]
             ys = [rd.fwd(k, day, h) for k in real]
             m = np.isfinite(ys)
-            if m.sum() >= 5 and np.std(np.array(xs)[m]) > 0:
+            if len(real) >= 5 and m.sum() >= 5 and np.std(np.array(xs)[m]) > 0:
                 out[dec["trajectory_id"]][name].append(stats.spearmanr(np.array(xs)[m], np.array(ys)[m])[0])
         ys1 = {k: rd.fwd(k, day, 1) for k in real}
-        if all(np.isfinite(v) for v in ys1.values()):
+        if len(real) >= 6 and all(np.isfinite(v) for v in ys1.values()):
             order = sorted(real, key=lambda k: sc[k])
             out[dec["trajectory_id"]]["spread"].append(np.mean([ys1[k] for k in order[-3:]]) -
                                                        np.mean([ys1[k] for k in order[:3]]))
         # RQ2 detection: score at t vs the planted signal that drives eps at t+1
         nxt = calendar.next_session(day, 1)
         for key, spec in rd.specs.items():
+            if key in drop:
+                continue
             sig = rd.signal.get((key, nxt))
             if spec["group"] != "noise" and sig is not None and np.isfinite(sig):
                 out[dec["trajectory_id"]][f"det:{spec['group']}:{spec['strength']}"].append((sc[key], sig))

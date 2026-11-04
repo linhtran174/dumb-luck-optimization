@@ -28,19 +28,51 @@ Written during the unattended build (Nov 3-4, 2026). Each entry says what change
 - DeepSeek runs with `reasoning.enabled=false`. StreamLake was removed from its providers: it spent the whole
   token budget on hidden reasoning and returned empty content.
 
-## Anonymization
+## Anonymization (scrub v2, Nov 4)
 
-- Alias dictionaries were built with DeepSeek, then hand-reviewed. Removed: countries, basins, index names, media
-  outlets, commentators and generic concepts, which would flag macro headlines and other companies' news. NVDA's
-  ~200 "partners" (every co-mentioned entity) were replaced with a curated list.
-- Regex matching is case-sensitive for proper nouns ("Chase" vs "chase", "COST" vs "cost").
-- The entailment call also lists leftover proper names (people, firms, products). Any name triggers the strict
-  re-scrub; a second hit drops the item. Government bodies and countries are allowed.
-- Scrubbed text stores companies as `[[KEY]]` tokens, mapped to per-trajectory labels only at render time.
-- Result for both windows: 4,392 selected items, 2,945 kept, 1,230 dropped as uninformative (listicles, options
-  activity), 159 failed entailment, 58 leaked twice. DeepSeek cost for this was about $0.30.
-- Known residual leak no regex can catch: semantic giveaways such as a bank CEO's widely reported remarks. The
-  weekly probe (G3) measures this.
+v1 (used by trial-v1) failed G3 at 70-80%: the scrubbed text still carried sector and business-model detail
+(weight-loss drugs, memberships, dairy plants, offshore basins). v2 replaced it before the test run:
+
+- **Industry-neutral rewrite.** Products, industry metrics, industry regulators/events, places and function-specific
+  roles become generic business terms. The company's own share-price moves are removed (agents have the prices).
+  Market items carry no company tokens at all. Ids are versioned (`v2:...`); v1 rows stay in the store for audit.
+- **Per-item attacker.** DeepSeek V4 Flash with reasoning (`deepseek_r`, same pinned snapshot) sees only the rewrite
+  and gives a probability per industry plus a company guess. A leak is p >= 0.40 on the true industry (chance 0.20)
+  or p >= 0.25 on the right company; a leak triggers the strict re-scrub, a second one drops the item. Attack-call
+  errors count as leaks (14 items in the dev window).
+- **Synthetic news goes through the same scrubber and checks.** It is written by mirroring randomly drawn real v2
+  items from the dev window only (same kind and direction, new specifics), so real and synthetic share one style,
+  and test-window news is never shown early. The plan's "neutral filler in the sector's voice" is dropped: sector
+  voice would mark synthetic assets once real news is industry-neutral. Template direction is independent of the
+  synthetic asset's future returns, so no signal is planted. Dropped synthetic items are regenerated (3 rounds).
+- Result: dev window 1,061 items, 581 kept (55%); test window 3,331 items, 1,799 kept (54%). v1 kept about 67%.
+- Synthetic news counts were re-matched to the v2 post-scrub real distribution (`dlo synth pregen`). Prices,
+  events, sentiments and signals are byte-identical to before (verified); only `news_count` changed. G1 and G4 are
+  unchanged.
+- Alias regex, generic date/amount patterns and the entailment + leftover-name check are unchanged.
+
+### G3 outcome: failed, leak accepted by the principal
+
+`dlo gate g3` probes many weeks outside any trajectory (variants: full, data-only, news-only).
+
+| Probe | Luna re-ID | Terra re-ID | Real-vs-synth accuracy (Luna / Terra) |
+|---|---|---|---|
+| trial-v1, v1 scrub, 1 week | 80% | 70% | 50% / 80% |
+| dev window, v2, 6 weeks | 28% | 55% | 61% / 63% |
+| test window, v2, 4 weeks (post-cutoff) | 40% | 52% | 66% / 72% |
+| dev window, prices only, 6 weeks | 10% | 13% | n/a |
+
+Prices alone are near chance except NVDA (83% for both). The remaining leak is the models' knowledge of these ten
+megacaps' storylines (direct-to-consumer drug pricing, chip export limits, project stakes, off-cycle earnings), which
+industry-neutral wording cannot remove. It persists after the Feb 16, 2026 cutoff. Further scrubbing would mainly
+discard news. The principal chose to **accept the leak** (Nov 4) over changing the universe or removing company news.
+G3 and G2 are reported as failed; the criteria were not relaxed.
+
+**Pre-registered robustness rule** (`metrics.identified_assets`, fixed before the test run): per model, an asset is
+dropped from the robustness analysis when that model's weekly probes identify it above chance (one-sided binomial,
+5%): a real asset named correctly above 10%, a synthetic one called synthetic above 50%. The report shows IC and
+planted-signal detection with and without the dropped assets (IC needs at least 5 real assets left). On the 4
+test-window probe weeks, both models would drop AAPL, LLY and NVDA; 34 weeks give more power, so expect more.
 
 ## Synthetic generator (M3)
 
@@ -73,12 +105,9 @@ Written during the unattended build (Nov 3-4, 2026). Each entry says what change
   top separators are mild (univariate AUC 0.57-0.62).
 - G4 pass: all ten assets within +/-0.011 of target.
 - G2 (probe, real vs synthetic): Luna 50% (pass), Terra **80% (fail)**, n=20 each.
-- G3: zero regex hits in accepted text (pass). Probe re-identification is **80% (Luna) and 70% (Terra)**, n=10
-  each, against a 20% threshold (fail). Both models name the right company for AAPL, COST, CVX, JNJ, LLY, NVDA
-  and WMT. They also assign sector-matching real names to most synthetic assets. Pairs don't hide identity,
-  because business-model cues in scrubbed news (membership, weight-loss drugs, GPUs, devices) separate the two
-  companies in each sector. Caveat: the trial is in December 2025, before both models' cutoff, so remembered
-  price paths may inflate G2 and G3 relative to the test window.
+- G3: zero regex hits in accepted text (pass). Probe re-identification **fails** (trial-v1: 80% Luna, 70% Terra;
+  after scrub v2: 40% and 52% on test-window weeks). Leak accepted by the principal; see Anonymization above.
+- G2 after scrub v2: 66% (Luna) and 72% (Terra) on test-window weeks, against 50% +/- 10 (fail).
 - G5: 82.8% first-try valid in trial-v1 (Terra 71%, Luna 93%). After adding a self-check line to the prompt,
   92.6% in trial-v2-g5 (27 decisions). The remaining failures are all weights plus cash summing to 1.03-1.12.
   Recommended fix (not applied; it changes the output protocol): drop `cash` from the schema and derive it as
@@ -90,6 +119,7 @@ Written during the unattended build (Nov 3-4, 2026). Each entry says what change
 
 - trial-v1 (14 trajectories, 5 days, 29 decisions + 16 memos): $0.94. trial-v2-g5: $0.85.
 - Terra is about $0.047 per decision (about 15k prompt tokens, 1k output); Luna is about $0.005.
+- Scrub v2 work (both windows re-scrubbed, synthetic news, 680 probe calls): about $7.50 infra.
 - Infrastructure through the trial: $0.83 (scrub both windows, aliases, synthetic news, 40 probes, G0 twice,
   judge).
 - Projected test window: 7 Terra trajectories x 170 days x $0.047 is about $56 with no sleep. Agents slept 60%

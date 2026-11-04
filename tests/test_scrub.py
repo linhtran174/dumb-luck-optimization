@@ -67,3 +67,19 @@ def test_company_guess_matching():
     assert not scrub._names_company("Apple", "NVDA")
     assert not scrub._names_company("cannot tell", "NVDA")
     assert scrub._names_company("Apple", "S03")       # any confident name for a synthetic subject is a leak
+
+
+def test_identified_assets_rule():
+    from dlo.analysis.metrics import identified_assets
+    store = RunStore()
+    rows = []
+    for w in range(30):
+        rows.append(("NVDA", 0, "NVIDIA Corp", "NVIDIA Corp" if w < 9 else "cannot tell", "real"))       # 30%: dropped
+        rows.append(("JPM", 0, "JPMorgan Chase & Co", "JPMorgan Chase & Co" if w < 4 else "Apple Inc", "real"))  # 13%: kept
+        rows.append(("S01", 1, "synthetic (not a real company)", "cannot tell", "synthetic" if w < 22 else "real"))
+        rows.append(("S02", 1, "synthetic (not a real company)", "cannot tell", "synthetic" if w < 16 else "real"))
+        for k, syn, truth, ans, ros in rows[-4:]:
+            store.put("probes", {"probe_id": f"t:{w}:{k}", "run_id": "t-ident", "week": w, "sim_day": "2026-03-06",
+                                 "model_key": "terra", "asset_key": k, "truth": truth, "is_synthetic": syn,
+                                 "answer": ans, "answer_synthetic": ros, "call_id": None, "created_at": "x"})
+    assert identified_assets(store, "t-ident")["terra"]["identified"] == ["NVDA", "S01"]

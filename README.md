@@ -35,6 +35,7 @@ dlo anon scrub all             # scrub every selected news item of both windows 
 dlo synth pregen               # M3: synthetic assets for both windows, hashed
 dlo synth news all             # synthetic news text, generated once
 dlo gate g1 | g4 | g0 [--forced]
+dlo gate g3 --window dev --weeks 6 --variant full|data|news   # multi-week re-identification probe
 dlo run window trial --run-id trial-v1      # 5-day trial, all 14 trajectories
 dlo analyze report trial-v1
 ```

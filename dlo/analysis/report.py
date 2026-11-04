@@ -55,7 +55,9 @@ async def build(store: RunStore, run_id: str, rd: metrics.RunData, client: LLMCl
     for t, p in port.items():
         p["random_agent_percentile_gross"] = float((rand < p["final_gross_equity"]).mean() * 100)
     rep = {"run_id": run_id, "days": [str(rd.days[0]), str(rd.days[-1])], "n_days": len(rd.days),
-           "ic_and_detection": metrics.ic_metrics(rd), "portfolio": port, "behavior": metrics.behavior(rd),
+           "ic_and_detection": metrics.ic_metrics(rd), "portfolio": port,
+           "identified_assets": (ident := metrics.identified_assets(store, run_id)),
+           "ic_and_detection_robust": metrics.ic_metrics(rd, {m: set(v["identified"]) for m, v in ident.items()}), "behavior": metrics.behavior(rd),
            "comparators": comp, "gates": metrics.gate_checks(rd),
            "random_agents": {"n": int(len(rand)), "p5": float(np.percentile(rand, 5)),
                              "p50": float(np.percentile(rand, 50)), "p95": float(np.percentile(rand, 95))}}
@@ -126,6 +128,16 @@ def markdown(rep: dict) -> str:
     L += ["## Skill and detection (RQ1, RQ2)", "| trajectory | IC1 | IC5 | top3-bottom3 | detection (score vs planted) |",
           "|---|---|---|---|---|"]
     for t, r in sorted(rep["ic_and_detection"].items()):
+        det = "; ".join(f"{k[4:]} {_f(v['corr'], 2)} (n={v['n']})" for k, v in sorted(r.items()) if k.startswith("det:"))
+        L.append(f"| {t} | {_f(r['ic1']['mean'], 3)} (n={r['ic1']['n']}) | {_f(r['ic5']['mean'], 3)} | "
+                 f"{_f(r['spread']['mean'], 4)} | {det} |")
+    L += ["", "## Robustness: assets identified by the probes dropped (pre-registered rule)",
+          "Per model, an asset is dropped when its weekly probes identify it above chance (one-sided binomial, 5%): "
+          "a real asset named correctly above 10%, a synthetic one called synthetic above 50%."]
+    for m, v in sorted(rep.get("identified_assets", {}).items()):
+        L.append(f"- {m}: dropped {', '.join(v['identified']) or 'none'}")
+    L += ["", "| trajectory | IC1 | IC5 | top3-bottom3 | detection (score vs planted) |", "|---|---|---|---|---|"]
+    for t, r in sorted(rep.get("ic_and_detection_robust", {}).items()):
         det = "; ".join(f"{k[4:]} {_f(v['corr'], 2)} (n={v['n']})" for k, v in sorted(r.items()) if k.startswith("det:"))
         L.append(f"| {t} | {_f(r['ic1']['mean'], 3)} (n={r['ic1']['n']}) | {_f(r['ic5']['mean'], 3)} | "
                  f"{_f(r['spread']['mean'], 4)} | {det} |")
